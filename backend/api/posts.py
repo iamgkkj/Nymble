@@ -23,6 +23,7 @@ def create_reply(
     post_id: int,
     content: str = Form(...),
     image: Optional[UploadFile] = File(None),
+    is_whisper: bool = Form(False),
     username: str = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -45,7 +46,8 @@ def create_reply(
         post_id=post_id,
         author_name=username,
         content=content,
-        image_url=image_url
+        image_url=image_url,
+        is_whisper=is_whisper
     )
     
     db.add(new_reply)

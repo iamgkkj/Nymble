@@ -30,6 +30,7 @@ async def websocket_chat(websocket: WebSocket, token: str):
                 content = payload.get("content")
                 
                 if target_token and content:
+                    is_whisper = payload.get("is_whisper", False)
                     from backend.core.moderation import moderate_content
                     try:
                         content = moderate_content(content)
@@ -42,7 +43,8 @@ async def websocket_chat(websocket: WebSocket, token: str):
                     msg = PrivateMessage(
                         sender_token=token,
                         receiver_token=target_token,
-                        content=content
+                        content=content,
+                        is_whisper=is_whisper
                     )
                     db.add(msg)
                     db.commit()
@@ -54,6 +56,7 @@ async def websocket_chat(websocket: WebSocket, token: str):
                         "from": username,
                         "from_token": token,
                         "content": content,
+                        "is_whisper": is_whisper,
                         "timestamp": msg.created_at.isoformat()
                     }
                     await manager.send_personal_message(outgoing_msg, target_token)
@@ -103,6 +106,7 @@ async def websocket_board_chat(websocket: WebSocket, board_name: str, token: str
                 content = payload.get("content")
                 
                 if content:
+                    is_whisper = payload.get("is_whisper", False)
                     from backend.core.moderation import moderate_content
                     try:
                         content = moderate_content(content)
@@ -116,7 +120,8 @@ async def websocket_board_chat(websocket: WebSocket, board_name: str, token: str
                         board_name=board_name,
                         sender_token=token,
                         author_name=username,
-                        content=content
+                        content=content,
+                        is_whisper=is_whisper
                     )
                     db.add(msg)
                     db.commit()
@@ -126,6 +131,7 @@ async def websocket_board_chat(websocket: WebSocket, board_name: str, token: str
                     outgoing_msg = {
                         "from": username,
                         "content": content,
+                        "is_whisper": is_whisper,
                         "timestamp": msg.created_at.isoformat()
                     }
                     await manager.broadcast_board(outgoing_msg, board_name)

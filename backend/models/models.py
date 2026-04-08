@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from backend.core.database import Base
 from datetime import datetime, timezone
@@ -19,6 +19,7 @@ class Post(Base):
     author_name = Column(String)
     content = Column(Text)
     image_url = Column(String, nullable=True)
+    is_whisper = Column(Boolean, default=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     board = relationship("Board", back_populates="posts")
@@ -32,6 +33,7 @@ class Reply(Base):
     author_name = Column(String)
     content = Column(Text)
     image_url = Column(String, nullable=True)
+    is_whisper = Column(Boolean, default=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     post = relationship("Post", back_populates="replies")
@@ -51,6 +53,7 @@ class PrivateMessage(Base):
     sender_token = Column(String, index=True)
     receiver_token = Column(String, index=True)
     content = Column(Text)
+    is_whisper = Column(Boolean, default=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 class BoardMessage(Base):
@@ -61,4 +64,5 @@ class BoardMessage(Base):
     sender_token = Column(String)
     author_name = Column(String)
     content = Column(Text)
+    is_whisper = Column(Boolean, default=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

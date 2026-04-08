@@ -33,7 +33,9 @@ We are following a phased approach to build out the core features without over-e
 - [x] Create centralized backend keyword filtering
 - [x] Detect banned terminologies to completely block request payloads
 - [x] Mask standard sensitive words dynamically in text payloads
-### Phase 8: Whisper mode (Pending)
+### Phase 8: Whisper mode (Completed)
+- [x] Add `is_whisper` flag to `Post`, `Reply`, `PrivateMessage`, and `BoardMessage`
+- [x] Integrate flag in all JSON schemas and WebSocket handlers
 ### Phase 9: UI polish + theme toggle (Pending)
 ### Phase 10: Documentation + scripts (Pending)
 

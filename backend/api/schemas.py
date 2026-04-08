@@ -31,6 +31,7 @@ class ReplyResponse(BaseModel):
     author_name: str
     content: str
     image_url: Optional[str] = None
+    is_whisper: bool = False
     created_at: datetime
 
     class Config:
@@ -42,6 +43,7 @@ class PostResponse(BaseModel):
     author_name: str
     content: str
     image_url: Optional[str] = None
+    is_whisper: bool = False
     created_at: datetime
     replies: List[ReplyResponse] = []
 
