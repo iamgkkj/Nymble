@@ -13,6 +13,7 @@ class SessionResponse(BaseModel):
 class CaptchaResponse(BaseModel):
     challenge_id: str
     question: str
+    options: List[str]
 
 class BoardBase(BaseModel):
     name: str

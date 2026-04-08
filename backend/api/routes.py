@@ -11,20 +11,24 @@ from backend.models.models import UserSession
 
 router = APIRouter()
 
-def create_captcha() -> tuple[str, str, str]:
-    num1 = random.randint(1, 10)
-    num2 = random.randint(1, 10)
-    question = f"What is {num1} + {num2}?"
-    answer = str(num1 + num2)
+EMOJIS = {"cat": "🐱", "dog": "🐶", "mouse": "🐭", "fox": "🦊", "bear": "🐻", "panda": "🐼", "lion": "🦁", "frog": "🐸"}
+
+def create_captcha() -> tuple[str, str, str, list]:
+    names = random.sample(list(EMOJIS.keys()), 4)
+    target_name = random.choice(names)
+    options = [EMOJIS[n] for n in names]
+    random.shuffle(options)
+    question = f"Prove you're human: Select the {target_name}"
+    answer = EMOJIS[target_name]
     challenge_id = str(uuid.uuid4())
-    return challenge_id, question, answer
+    return challenge_id, question, answer, options
 
 @router.get("/captcha", response_model=CaptchaResponse)
 def get_captcha():
-    """Generates a simple CAPTCHA challenge."""
-    challenge_id, question, answer = create_captcha()
+    """Generates an emoji CAPTCHA challenge."""
+    challenge_id, question, answer, options = create_captcha()
     CAPTCHA_STORE[challenge_id] = answer
-    return CaptchaResponse(challenge_id=challenge_id, question=question)
+    return CaptchaResponse(challenge_id=challenge_id, question=question, options=options)
 
 @router.post("/verify-captcha", response_model=SessionResponse)
 def verify_captcha(attempt: CaptchaAttempt, db: Session = Depends(get_db)):

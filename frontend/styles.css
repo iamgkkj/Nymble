@@ -397,3 +397,105 @@ body.light-theme .glass-btn:hover {
         top: 0;
     }
 }
+
+/* Additional CSS for posts and colorful borders */
+.emoji-options-group {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+}
+
+.emoji-btn {
+    font-size: 2rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.emoji-btn:hover:not(:disabled) {
+    transform: translateY(-4px) scale(1.1);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 25px var(--accent-glow);
+}
+
+.emoji-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Posts Feed Styling */
+.post-card {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.post-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+}
+
+/* Vibrant colors */
+.post-card.color-1::before { background: #ff007b; }
+.post-card.color-2::before { background: #00f0ff; }
+.post-card.color-3::before { background: #ffea00; }
+.post-card.color-4::before { background: #8a2be2; }
+.post-card.color-5::before { background: #00ff88; }
+
+.post-card.color-1 { border: 1px solid rgba(255, 0, 123, 0.3); }
+.post-card.color-2 { border: 1px solid rgba(0, 240, 255, 0.3); }
+.post-card.color-3 { border: 1px solid rgba(255, 234, 0, 0.3); }
+.post-card.color-4 { border: 1px solid rgba(138, 43, 226, 0.3); }
+.post-card.color-5 { border: 1px solid rgba(0, 255, 136, 0.3); }
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.post-author {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.post-time {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.post-text {
+    font-size: 1.15rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.whisper-text {
+    color: var(--text-secondary);
+}
+
+.blurred {
+    filter: blur(8px);
+    transition: var(--transition-smooth);
+    user-select: none;
+    cursor: pointer;
+}
+
+.blurred:hover, .blurred:active {
+    filter: blur(0px);
+}

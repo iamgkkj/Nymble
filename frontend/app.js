@@ -15,9 +15,8 @@ const views = {
 };
 
 const captchaQ = document.getElementById('captcha-question');
-const captchaAns = document.getElementById('captcha-answer');
+const captchaOpts = document.getElementById('captcha-options');
 const authError = document.getElementById('auth-error');
-const btnSubmitCaptcha = document.getElementById('btn-submit-captcha');
 const themeToggle = document.getElementById('theme-toggle');
 
 // INIT
@@ -59,28 +58,36 @@ function setupThemeToggle() {
 // -- CAPTCHA FLOW --
 async function loadCaptcha() {
     try {
-        const res = await fetch(`${API_BASE}/auth/captcha`);
+        const res = await fetch(`${API_BASE}/captcha`);
         const data = await res.json();
         captchaQ.innerText = data.question;
-        state.captchaSalt = data.salt;
+        state.challengeId = data.challenge_id;
+        
+        captchaOpts.innerHTML = '';
+        data.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'glass-btn emoji-btn';
+            btn.innerText = opt;
+            btn.onclick = () => submitCaptcha(opt);
+            captchaOpts.appendChild(btn);
+        });
     } catch(e) {
         captchaQ.innerText = "Error loading secure gateway. Refresh the page.";
     }
 }
 
-btnSubmitCaptcha.addEventListener('click', async () => {
-    const answer = captchaAns.value.trim();
-    if (!answer) return;
-    
+async function submitCaptcha(answer) {
     authError.classList.add('hidden');
-    const oldHtml = btnSubmitCaptcha.innerHTML;
-    btnSubmitCaptcha.innerHTML = 'Verifying...';
+    
+    // Disable buttons
+    const btns = captchaOpts.querySelectorAll('button');
+    btns.forEach(b => b.disabled = true);
     
     try {
-        const res = await fetch(`${API_BASE}/auth/verify-captcha`, {
+        const res = await fetch(`${API_BASE}/verify-captcha`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ answer, salt: state.captchaSalt })
+            body: JSON.stringify({ solution: answer, challenge_id: state.challengeId })
         });
         const data = await res.json();
         
@@ -95,15 +102,13 @@ btnSubmitCaptcha.addEventListener('click', async () => {
             authError.innerText = data.detail || 'Incorrect answer.';
             authError.classList.remove('hidden');
             loadCaptcha(); // load new one
-            captchaAns.value = '';
         }
     } catch(e) {
         authError.innerText = 'Network error. Try again.';
         authError.classList.remove('hidden');
-    } finally {
-        btnSubmitCaptcha.innerHTML = oldHtml;
+        btns.forEach(b => b.disabled = false);
     }
-});
+}
 
 // -- BOARDS FLOW --
 async function initBoardsView() {
@@ -133,11 +138,90 @@ async function loadBoards() {
                 document.querySelectorAll('#board-list li').forEach(el=>el.classList.remove('active'));
                 li.classList.add('active');
                 state.currentBoard = b.name;
-                // Load feed...
+                loadFeed(b.name);
             });
             list.appendChild(li);
         });
+        
+        if (boards.length > 0) {
+            loadFeed(boards[0].name);
+        }
     } catch(e) {
         console.error("Failed to load boards", e);
     }
 }
+
+async function loadFeed(boardName) {
+    const container = document.getElementById('posts-container');
+    container.innerHTML = '<div class="glass-panel skeleton-loader"><p>Loading feeds...</p></div>';
+    
+    try {
+        const res = await fetch(`${API_BASE}/boards/${boardName}/posts`, {
+            headers: { 'X-Session-Token': state.token }
+        });
+        const posts = await res.json();
+        
+        container.innerHTML = '';
+        if (posts.length === 0) {
+            container.innerHTML = '<div class="glass-panel" style="padding: 2rem; text-align: center;"><p>No posts here yet. Be the first!</p></div>';
+            return;
+        }
+        
+        posts.forEach((p, idx) => {
+            const card = document.createElement('div');
+            // Give it a random colorful glow class (color-1 through color-5)
+            const colorClass = `color-${(idx % 5) + 1}`; 
+            card.className = `glass-panel post-card ${colorClass}`;
+            
+            let contentHtml = `<p class="post-text">${p.content}</p>`;
+            if (p.is_whisper) {
+                contentHtml = `<p class="post-text whisper-text"><em>[Whisper]</em> <span class="blurred">${p.content}</span></p>`;
+            }
+            
+            card.innerHTML = `
+                <div class="post-header">
+                    <span class="post-author">${p.author_name}</span>
+                    <span class="post-time">${new Date(p.created_at).toLocaleString()}</span>
+                </div>
+                <div class="post-body">
+                    ${contentHtml}
+                    ${p.image_url ? `<img src="${p.image_url}" class="post-image" />` : ''}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    } catch(e) {
+        container.innerHTML = '<div class="glass-panel" style="padding: 2rem; color: #ff4a4a;"><p>Error loading posts.</p></div>';
+    }
+}
+
+// POST BUTTON LISTENER
+document.getElementById('btn-post').addEventListener('click', async () => {
+    const textInput = document.getElementById('composer-text');
+    const whisperToggle = document.getElementById('composer-whisper');
+    
+    const text = textInput.value.trim();
+    if (!text) return;
+    
+    const fd = new FormData();
+    fd.append("content", text);
+    fd.append("is_whisper", whisperToggle.checked);
+    
+    try {
+        const res = await fetch(`${API_BASE}/boards/${state.currentBoard}/posts`, {
+            method: 'POST',
+            headers: { 'X-Session-Token': state.token },
+            body: fd
+        });
+        if (res.ok) {
+            textInput.value = '';
+            whisperToggle.checked = false;
+            loadFeed(state.currentBoard);
+        } else {
+            const err = await res.json();
+            alert("Error posting: " + (err.detail || "Unknown"));
+        }
+    } catch (e) {
+        console.error("Failed to post:", e);
+    }
+});
