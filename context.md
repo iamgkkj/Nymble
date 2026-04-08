@@ -29,7 +29,10 @@ We are following a phased approach to build out the core features without over-e
 - [x] Extend WebSocket connection manager for public rooms
 - [x] Create persistent BoardMessage DB model
 - [x] Build board-specific WebSocket lobby endpoint
-### Phase 7: Content moderation (Pending)
+### Phase 7: Content moderation (Completed)
+- [x] Create centralized backend keyword filtering
+- [x] Detect banned terminologies to completely block request payloads
+- [x] Mask standard sensitive words dynamically in text payloads
 ### Phase 8: Whisper mode (Pending)
 ### Phase 9: UI polish + theme toggle (Pending)
 ### Phase 10: Documentation + scripts (Pending)

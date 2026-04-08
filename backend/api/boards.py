@@ -64,6 +64,12 @@ def create_board_post(
     if image and image.filename:
         image_url = save_upload_file(image)
     
+    from backend.core.moderation import moderate_content
+    try:
+        content = moderate_content(content)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
     new_post = Post(
         board_name=board_name,
         author_name=username,

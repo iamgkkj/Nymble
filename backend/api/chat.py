@@ -30,6 +30,13 @@ async def websocket_chat(websocket: WebSocket, token: str):
                 content = payload.get("content")
                 
                 if target_token and content:
+                    from backend.core.moderation import moderate_content
+                    try:
+                        content = moderate_content(content)
+                    except ValueError:
+                        await manager.send_personal_message({"error": "Content blocked by moderation"}, token)
+                        continue
+                        
                     # Save to DB
                     db = SessionLocal()
                     msg = PrivateMessage(
@@ -96,6 +103,14 @@ async def websocket_board_chat(websocket: WebSocket, board_name: str, token: str
                 content = payload.get("content")
                 
                 if content:
+                    from backend.core.moderation import moderate_content
+                    try:
+                        content = moderate_content(content)
+                    except ValueError:
+                        # For websockets we could send an error back or drop the message
+                        await manager.send_personal_message({"error": "Content blocked by moderation"}, token)
+                        continue
+                        
                     db = SessionLocal()
                     msg = BoardMessage(
                         board_name=board_name,

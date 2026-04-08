@@ -35,6 +35,12 @@ def create_reply(
     if image and image.filename:
         image_url = save_upload_file(image)
         
+    from backend.core.moderation import moderate_content
+    try:
+        content = moderate_content(content)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+        
     new_reply = Reply(
         post_id=post_id,
         author_name=username,
