@@ -16,13 +16,8 @@
         <div class="orb orb-2"></div>
         <div class="orb orb-3"></div>
     </div>
-
-    <!-- Theme Toggle -->
-    <button id="theme-toggle" class="glass-btn icon-btn" aria-label="Toggle Theme">
-        <span class="icon">✨</span>
-    </button>
-
     <main class="app-container">
+
         <!-- Auth / CAPTCHA View -->
         <section id="auth-view" class="view glass-panel active">
             <header class="view-header centered">
@@ -41,38 +36,47 @@
 
         <!-- Main Feed / Boards View -->
         <section id="boards-view" class="view hidden">
-            <header class="app-topbar glass-panel-sm">
-                <div class="topbar-left">
-                    <h2>Nymble</h2>
+            <header class="app-topbar glass-panel-sm" style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="topbar-left" style="display:flex; align-items:center; gap: 0.75rem;">
+                    <img src="/logo/Nymble's friendly ghost logo.png" alt="Logo" style="height: 48px;">
+                    <h1 class="logo" style="margin: 0; font-size: 2rem;">Nymble</h1>
                 </div>
-                <div class="topbar-right">
-                    <div class="identity-badge glass-panel-sm">
-                        <span class="identity-icon">🎭</span>
-                        <span id="user-identity">Anonymous</span>
+                <div class="topbar-right" style="display:flex; align-items:center; gap: 1rem;">
+                    <button id="theme-toggle" class="glass-btn icon-btn" style="width: 48px; height: 48px; border-radius: 50%; font-size: 1.25rem;">🌓</button>
+                    <div class="identity-badge glass-panel-sm topbar-badge" title="Click to backup your session token">
+                        <span class="identity-icon" style="font-size: 1.5rem">🎭</span>
+                        <span id="user-identity" style="font-size: 1.2rem; font-weight: 800;">Anonymous</span>
                     </div>
                 </div>
             </header>
 
             <div class="boards-layout">
                 <aside class="sidebar glass-panel">
-                    <div class="sidebar-section">
-                        <h3>Public Boards</h3>
-                        <ul id="board-list" class="nav-list">
-                            <!-- Populated dynamically -->
-                        </ul>
-                    </div>
+                    <h3 style="margin-bottom: 0.5rem; color: var(--accent-glow);">Private Chats</h3>
+                    <ul id="chat-list" class="nav-list" style="margin-top: 0; margin-bottom: 1.5rem">
+                        <li id="new-chat-btn" style="color: #00f0ff;">
+                            <span class="chat-icon my-icon">💬</span> New Message
+                        </li>
+                    </ul>
+                    
+                    <h3>Boards</h3>
+                    <ul id="board-list" class="nav-list">
+                        <!-- Populated by JS -->
+                    </ul>
                 </aside>
                 
-                <div class="feed-area">
+                <div id="feed-container" class="feed-area">
                     <div class="composer glass-panel">
-                        <textarea id="composer-text" placeholder="Share your thoughts (whispers supported)..."></textarea>
+                        <textarea id="composer-text" placeholder="Share your anonymous thoughts..."></textarea>
                         <div class="composer-actions">
                             <label class="whisper-toggle">
                                 <input type="checkbox" id="composer-whisper">
-                                <span class="toggle-slider"></span>
-                                <span class="toggle-label">Whisper Mode</span>
+                                <div class="toggle-slider"></div>
+                                <span>Whisper Mode</span>
                             </label>
-                            <button id="btn-post" class="glass-btn primary-btn">Post</button>
+                            <button id="btn-post" class="glass-btn primary-btn">
+                                Post <span class="arrow">→</span>
+                            </button>
                         </div>
                     </div>
                     
@@ -82,6 +86,35 @@
                             <p>Loading feeds...</p>
                         </div>
                     </div>
+                </div>
+                
+                <!-- NEW Dedicated Inboxes/Chat View -->
+                <div id="inbox-container" class="feed-area hidden">
+                    <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;">
+                        <h2 style="margin-bottom: 1rem; color: var(--accent-glow)">Direct Inboxes</h2>
+                        <div style="display: flex; gap: 1rem;">
+                            <input type="text" id="new-chat-input" placeholder="Enter target Token or Username" style="flex:1; padding: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: var(--text-primary);">
+                            <button id="btn-start-chat" class="glass-btn primary-btn">Start Chat</button>
+                        </div>
+                    </div>
+                    <div id="inbox-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- Inboxes inject here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Overlay Panel -->
+            <div id="chat-overlay" class="glass-panel chat-hidden">
+                <div class="chat-header">
+                    <h3>Chat with <span id="chat-target-user" style="color:var(--accent-glow)">User</span></h3>
+                    <button id="close-chat" class="glass-btn icon-btn">✕</button>
+                </div>
+                <div id="chat-messages" class="chat-messages-container">
+                    <!-- Dynamic chat bubbles -->
+                </div>
+                <div class="chat-composer">
+                    <input type="text" id="chat-input" placeholder="Type a secure message...">
+                    <button id="btn-send-chat" class="glass-btn primary-btn">Send</button>
                 </div>
             </div>
         </section>

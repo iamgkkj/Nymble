@@ -1,7 +1,9 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, Header, HTTPException, status
 from backend.core.ws_manager import manager
-from backend.core.database import SessionLocal
-from backend.models.models import PrivateMessage, UserSession
+from backend.core.database import SessionLocal, get_db
+from sqlalchemy.orm import Session
+from sqlalchemy import or_, and_
+from backend.models.models import PrivateMessage, UserSession, BoardMessage, Board
 import json
 
 router = APIRouter()
@@ -24,12 +26,12 @@ async def websocket_chat(websocket: WebSocket, token: str):
         while True:
             data = await websocket.receive_text()
             try:
-                # Expecting payload: {"to": "receiver_token", "content": "..."}
+                # Expecting payload: {"to": "username", "content": "..."}
                 payload = json.loads(data)
-                target_token = payload.get("to")
+                target_username = payload.get("to")
                 content = payload.get("content")
                 
-                if target_token and content:
+                if target_username and content:
                     is_whisper = payload.get("is_whisper", False)
                     from backend.core.moderation import moderate_content
                     try:
@@ -38,8 +40,17 @@ async def websocket_chat(websocket: WebSocket, token: str):
                         await manager.send_personal_message({"error": "Content blocked by moderation"}, token)
                         continue
                         
-                    # Save to DB
                     db = SessionLocal()
+                    # Resolve username to target token
+                    target_user = db.query(UserSession).filter(UserSession.username == target_username).first()
+                    if not target_user:
+                        await manager.send_personal_message({"error": "User not found or offline"}, token)
+                        db.close()
+                        continue
+                        
+                    target_token = target_user.token
+                        
+                    # Save to DB
                     msg = PrivateMessage(
                         sender_token=token,
                         receiver_token=target_token,
@@ -54,7 +65,6 @@ async def websocket_chat(websocket: WebSocket, token: str):
                     # Send to target if online
                     outgoing_msg = {
                         "from": username,
-                        "from_token": token,
                         "content": content,
                         "is_whisper": is_whisper,
                         "timestamp": msg.created_at.isoformat()
@@ -74,7 +84,60 @@ async def websocket_chat(websocket: WebSocket, token: str):
     except WebSocketDisconnect:
         manager.disconnect(token, websocket)
 
-from backend.models.models import BoardMessage, Board
+@router.get("/chats")
+def get_inbox(x_session_token: str = Header(...), db: Session = Depends(get_db)):
+    """Returns a list of usernames the current user has chatted with."""
+    user = db.query(UserSession).filter(UserSession.token == x_session_token).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token")
+        
+    # Find all messages where this user was sender or receiver
+    messages = db.query(PrivateMessage).filter(
+        or_(
+            PrivateMessage.sender_token == x_session_token,
+            PrivateMessage.receiver_token == x_session_token
+        )
+    ).all()
+    
+    # Extract unique tokens they chatted with
+    chat_partner_tokens = set()
+    for m in messages:
+        if m.sender_token != x_session_token:
+            chat_partner_tokens.add(m.sender_token)
+        if m.receiver_token != x_session_token:
+            chat_partner_tokens.add(m.receiver_token)
+            
+    # Resolve tokens to usernames
+    partners = db.query(UserSession).filter(UserSession.token.in_(list(chat_partner_tokens))).all()
+    
+    inbox = [{"username": p.username, "token": p.token} for p in partners]
+    return inbox
+
+@router.get("/chats/{username}")
+def get_chat_history(username: str, x_session_token: str = Header(...), db: Session = Depends(get_db)):
+    """Returns message history with a specific username."""
+    user = db.query(UserSession).filter(UserSession.token == x_session_token).first()
+    target_user = db.query(UserSession).filter(UserSession.username == username).first()
+    
+    if not user or not target_user:
+        raise HTTPException(status_code=400, detail="Invalid user or target")
+        
+    messages = db.query(PrivateMessage).filter(
+        or_(
+            and_(PrivateMessage.sender_token == x_session_token, PrivateMessage.receiver_token == target_user.token),
+            and_(PrivateMessage.sender_token == target_user.token, PrivateMessage.receiver_token == x_session_token)
+        )
+    ).order_by(PrivateMessage.created_at.asc()).all()
+    
+    history = []
+    for m in messages:
+        sender_name = user.username if m.sender_token == x_session_token else target_user.username
+        history.append({
+            "from": sender_name,
+            "content": m.content,
+            "created_at": m.created_at.isoformat()
+        })
+    return history
 
 @router.websocket("/ws/boards/{board_name}/{token}")
 async def websocket_board_chat(websocket: WebSocket, board_name: str, token: str):
