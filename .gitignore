@@ -1,0 +1,8 @@
+venv/
+__pycache__/
+.env
+node_modules/
+*.log
+.DS_Store
+*.sqlite3
+uploaded_media/
