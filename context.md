@@ -17,7 +17,10 @@ We are following a phased approach to build out the core features without over-e
 - [x] Configure backend static file serving
 - [x] Support image uploads for posts
 - [x] Add threads and replies functionality
-### Phase 4: Token-based session restore (Pending)
+### Phase 4: Token-based session restore (Completed)
+- [x] Create SQLite-backed Session model (`UserSession`)
+- [x] Persist identities across server restarts
+- [x] Integrate session header validation in all secure endpoints
 ### Phase 5: Real-time private chat (Pending)
 ### Phase 6: Board chatrooms (Pending)
 ### Phase 7: Content moderation (Pending)

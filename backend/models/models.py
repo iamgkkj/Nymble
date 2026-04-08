@@ -35,3 +35,11 @@ class Reply(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     post = relationship("Post", back_populates="replies")
+
+class UserSession(Base):
+    """Database backed session store so identities persist across server reboots."""
+    __tablename__ = "user_sessions"
+
+    token = Column(String, primary_key=True, index=True)
+    username = Column(String)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

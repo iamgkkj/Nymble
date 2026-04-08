@@ -1,10 +1,13 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Header, Depends
+from sqlalchemy.orm import Session
 import uuid
 import random
-from typing import Dict
-from .schemas import CaptchaAttempt, SessionResponse, CaptchaResponse
+
+from backend.api.schemas import CaptchaAttempt, SessionResponse, CaptchaResponse
 from backend.core.security import generate_anonymous_name, generate_session_token
-from backend.core.state import CAPTCHA_STORE, SESSION_STORE
+from backend.core.state import CAPTCHA_STORE
+from backend.core.database import get_db
+from backend.models.models import UserSession
 
 router = APIRouter()
 
@@ -24,8 +27,8 @@ def get_captcha():
     return CaptchaResponse(challenge_id=challenge_id, question=question)
 
 @router.post("/verify-captcha", response_model=SessionResponse)
-def verify_captcha(attempt: CaptchaAttempt):
-    """Verifies CAPTCHA and returns a new session token & username on success."""
+def verify_captcha(attempt: CaptchaAttempt, db: Session = Depends(get_db)):
+    """Verifies CAPTCHA and returns a new persistent session token & username on success."""
     if attempt.challenge_id not in CAPTCHA_STORE:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired CAPTCHA challenge.")
     
@@ -38,15 +41,21 @@ def verify_captcha(attempt: CaptchaAttempt):
     token = generate_session_token()
     username = generate_anonymous_name()
     
-    # Store session (temporarily in memory)
-    SESSION_STORE[token] = username
+    # Store persistent session in database
+    new_session = UserSession(token=token, username=username)
+    db.add(new_session)
+    db.commit()
     
     return SessionResponse(token=token, username=username)
 
 @router.get("/me", response_model=SessionResponse)
-def get_current_user(token: str):
-    """Restores session identity using token."""
-    if token not in SESSION_STORE:
+def get_current_user_route(
+    x_session_token: str = Header(..., description="Session token generated after CAPTCHA"),
+    db: Session = Depends(get_db)
+):
+    """Restores session identity using token header."""
+    user_session = db.query(UserSession).filter(UserSession.token == x_session_token).first()
+    if not user_session:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     
-    return SessionResponse(token=token, username=SESSION_STORE[token])
+    return SessionResponse(token=user_session.token, username=user_session.username)
