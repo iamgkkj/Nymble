@@ -25,7 +25,10 @@ We are following a phased approach to build out the core features without over-e
 - [x] Create WebSocket connection manager for live message routing
 - [x] Create persistent PrivateMessage DB model
 - [x] Build isolated 1-to-1 token-based WebSocket channels
-### Phase 6: Board chatrooms (Pending)
+### Phase 6: Board chatrooms (Completed)
+- [x] Extend WebSocket connection manager for public rooms
+- [x] Create persistent BoardMessage DB model
+- [x] Build board-specific WebSocket lobby endpoint
 ### Phase 7: Content moderation (Pending)
 ### Phase 8: Whisper mode (Pending)
 ### Phase 9: UI polish + theme toggle (Pending)

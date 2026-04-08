@@ -52,3 +52,13 @@ class PrivateMessage(Base):
     receiver_token = Column(String, index=True)
     content = Column(Text)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+class BoardMessage(Base):
+    __tablename__ = "board_messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    board_name = Column(String, ForeignKey("boards.name"), index=True)
+    sender_token = Column(String)
+    author_name = Column(String)
+    content = Column(Text)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

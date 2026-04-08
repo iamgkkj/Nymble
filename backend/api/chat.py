@@ -63,3 +63,60 @@ async def websocket_chat(websocket: WebSocket, token: str):
                 
     except WebSocketDisconnect:
         manager.disconnect(token, websocket)
+
+from backend.models.models import BoardMessage, Board
+
+@router.websocket("/ws/boards/{board_name}/{token}")
+async def websocket_board_chat(websocket: WebSocket, board_name: str, token: str):
+    db = SessionLocal()
+    
+    # Verify token
+    user = db.query(UserSession).filter(UserSession.token == token).first()
+    if not user:
+        db.close()
+        await websocket.close(code=1008)
+        return
+        
+    # Verify board exists
+    board = db.query(Board).filter(Board.name == board_name).first()
+    if not board:
+        db.close()
+        await websocket.close(code=1008)
+        return
+
+    username = user.username
+    db.close()
+
+    await manager.connect_board(board_name, websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            try:
+                payload = json.loads(data)
+                content = payload.get("content")
+                
+                if content:
+                    db = SessionLocal()
+                    msg = BoardMessage(
+                        board_name=board_name,
+                        sender_token=token,
+                        author_name=username,
+                        content=content
+                    )
+                    db.add(msg)
+                    db.commit()
+                    db.refresh(msg)
+                    db.close()
+                    
+                    outgoing_msg = {
+                        "from": username,
+                        "content": content,
+                        "timestamp": msg.created_at.isoformat()
+                    }
+                    await manager.broadcast_board(outgoing_msg, board_name)
+                    
+            except json.JSONDecodeError:
+                pass
+                
+    except WebSocketDisconnect:
+        manager.disconnect_board(board_name, websocket)
