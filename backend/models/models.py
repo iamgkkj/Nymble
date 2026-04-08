@@ -43,3 +43,12 @@ class UserSession(Base):
     token = Column(String, primary_key=True, index=True)
     username = Column(String)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+class PrivateMessage(Base):
+    __tablename__ = "private_messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    sender_token = Column(String, index=True)
+    receiver_token = Column(String, index=True)
+    content = Column(Text)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

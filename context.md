@@ -21,7 +21,10 @@ We are following a phased approach to build out the core features without over-e
 - [x] Create SQLite-backed Session model (`UserSession`)
 - [x] Persist identities across server restarts
 - [x] Integrate session header validation in all secure endpoints
-### Phase 5: Real-time private chat (Pending)
+### Phase 5: Real-time private chat (Completed)
+- [x] Create WebSocket connection manager for live message routing
+- [x] Create persistent PrivateMessage DB model
+- [x] Build isolated 1-to-1 token-based WebSocket channels
 ### Phase 6: Board chatrooms (Pending)
 ### Phase 7: Content moderation (Pending)
 ### Phase 8: Whisper mode (Pending)
