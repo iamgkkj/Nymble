@@ -1,6 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.api.routes import router
+from backend.api.routes import router as auth_router
+from backend.api.boards import router as boards_router
+from backend.core.database import Base, engine
+
+# Create database tables
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Nymble API", description="Privacy-first, anonymous social interaction platform.")
 
@@ -13,7 +18,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router, prefix="/api")
+app.include_router(auth_router, prefix="/api", tags=["Auth"])
+app.include_router(boards_router, prefix="/api", tags=["Boards"])
 
 @app.get("/")
 def health_check():

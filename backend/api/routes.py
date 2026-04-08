@@ -4,14 +4,9 @@ import random
 from typing import Dict
 from .schemas import CaptchaAttempt, SessionResponse, CaptchaResponse
 from backend.core.security import generate_anonymous_name, generate_session_token
+from backend.core.state import CAPTCHA_STORE, SESSION_STORE
 
 router = APIRouter()
-
-# In-memory stores for iteration (would be DB in production)
-# challenge_id -> correct answer
-CAPTCHA_STORE: Dict[str, str] = {}
-# token -> username
-SESSION_STORE: Dict[str, str] = {}
 
 def create_captcha() -> tuple[str, str, str]:
     num1 = random.randint(1, 10)

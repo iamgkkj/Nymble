@@ -9,7 +9,10 @@ We are following a phased approach to build out the core features without over-e
 - [x] CAPTCHA system mock/validation
 - [x] Anonymous identity generation
 
-### Phase 2: Board system + post feed (Pending)
+### Phase 2: Board system + post feed (Completed)
+- [x] Create board definitions and initial database schema
+- [x] Board retrieval endpoints
+- [x] Create post and get posts endpoints with auth
 ### Phase 3: Image posting + replies (Pending)
 ### Phase 4: Token-based session restore (Pending)
 ### Phase 5: Real-time private chat (Pending)
