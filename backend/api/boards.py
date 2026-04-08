@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Form, UploadFile, File
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 from backend.core.database import get_db
 from backend.models.models import Board, Post
-from backend.api.schemas import BoardResponse, PostCreate, PostResponse
+from backend.api.schemas import BoardResponse, PostResponse
 from backend.api.dependencies import get_current_user
+from backend.core.upload import save_upload_file
 
 router = APIRouter()
 
@@ -23,7 +24,6 @@ DEFAULT_BOARDS = [
 ]
 
 def init_boards(db: Session):
-    """Initializes the default boards if they do not exist."""
     for b_data in DEFAULT_BOARDS:
         board = db.query(Board).filter(Board.name == b_data["name"]).first()
         if not board:
@@ -33,9 +33,7 @@ def init_boards(db: Session):
 
 @router.get("/boards", response_model=List[BoardResponse])
 def get_boards(db: Session = Depends(get_db)):
-    """Retrieve all available boards."""
     boards = db.query(Board).all()
-    # Auto-initialize if empty (useful for first run)
     if not boards:
         init_boards(db)
         boards = db.query(Board).all()
@@ -43,31 +41,34 @@ def get_boards(db: Session = Depends(get_db)):
 
 @router.get("/boards/{board_name}/posts", response_model=List[PostResponse])
 def get_board_posts(board_name: str, db: Session = Depends(get_db)):
-    """Retrieve all posts for a specific board."""
     board = db.query(Board).filter(Board.name == board_name).first()
     if not board:
         raise HTTPException(status_code=404, detail="Board not found")
     
-    # Return posts ordered by newest first
     posts = db.query(Post).filter(Post.board_name == board_name).order_by(Post.created_at.desc()).all()
     return posts
 
 @router.post("/boards/{board_name}/posts", response_model=PostResponse, status_code=status.HTTP_201_CREATED)
 def create_board_post(
     board_name: str,
-    post_in: PostCreate,
+    content: str = Form(...),
+    image: Optional[UploadFile] = File(None),
     username: str = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Create a new post in a specific board. Requires session token."""
     board = db.query(Board).filter(Board.name == board_name).first()
     if not board:
         raise HTTPException(status_code=404, detail="Board not found")
     
+    image_url = None
+    if image and image.filename:
+        image_url = save_upload_file(image)
+    
     new_post = Post(
         board_name=board_name,
         author_name=username,
-        content=post_in.content
+        content=content,
+        image_url=image_url
     )
     db.add(new_post)
     db.commit()

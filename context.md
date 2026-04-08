@@ -13,7 +13,10 @@ We are following a phased approach to build out the core features without over-e
 - [x] Create board definitions and initial database schema
 - [x] Board retrieval endpoints
 - [x] Create post and get posts endpoints with auth
-### Phase 3: Image posting + replies (Pending)
+### Phase 3: Image posting + replies (Completed)
+- [x] Configure backend static file serving
+- [x] Support image uploads for posts
+- [x] Add threads and replies functionality
 ### Phase 4: Token-based session restore (Pending)
 ### Phase 5: Real-time private chat (Pending)
 ### Phase 6: Board chatrooms (Pending)

@@ -19,20 +19,31 @@ class BoardBase(BaseModel):
     description: str
 
 class BoardResponse(BoardBase):
-    pass
     class Config:
         from_attributes = True
 
-class PostCreate(BaseModel):
+class ReplyCreate(BaseModel):
     content: str
-    # image handling will be added in phase 3
+
+class ReplyResponse(BaseModel):
+    id: int
+    post_id: int
+    author_name: str
+    content: str
+    image_url: Optional[str] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
 
 class PostResponse(BaseModel):
     id: int
     board_name: str
     author_name: str
     content: str
+    image_url: Optional[str] = None
     created_at: datetime
+    replies: List[ReplyResponse] = []
 
     class Config:
         from_attributes = True
