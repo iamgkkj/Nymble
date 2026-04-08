@@ -36,7 +36,10 @@ We are following a phased approach to build out the core features without over-e
 ### Phase 8: Whisper mode (Completed)
 - [x] Add `is_whisper` flag to `Post`, `Reply`, `PrivateMessage`, and `BoardMessage`
 - [x] Integrate flag in all JSON schemas and WebSocket handlers
-### Phase 9: UI polish + theme toggle (Pending)
+### Phase 9: UI polish + theme toggle (Completed)
+- [x] Create gorgeous zero-build plain HTML/JS frontend architecture
+- [x] Integrate luxury glassmorphism stylesheets and dynamic background orbs
+- [x] Hook in theme toggling logic (Dark/Light mode) without frameworks
 ### Phase 10: Documentation + scripts (Pending)
 
 ## Completed Features

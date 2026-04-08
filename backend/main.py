@@ -31,6 +31,13 @@ app.include_router(boards_router, prefix="/api", tags=["Boards"])
 app.include_router(posts_router, prefix="/api", tags=["Posts"])
 app.include_router(chat_router, tags=["Chat"])
 
-@app.get("/")
-def health_check():
-    return {"status": "ok", "message": "Nymble Backend is running."}
+# IMPORTANT: Mount frontend last to not eclipse API routes
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.join(BASE_DIR, "..", "frontend")
+
+if os.path.exists(FRONTEND_DIR):
+    app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
+else:
+    @app.get("/")
+    def health_check():
+        return {"status": "ok", "message": "Nymble Backend is running (Frontend not found)."}

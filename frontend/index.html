@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nymble | Anonymous Interaction, Elevated</title>
+    <meta name="description" content="A privacy-first, beautiful, low-pressure social interaction platform. Enter via CAPTCHA. No logins.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="dark-theme">
+    <div class="background-gradients">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button id="theme-toggle" class="glass-btn icon-btn" aria-label="Toggle Theme">
+        <span class="icon">✨</span>
+    </button>
+
+    <main class="app-container">
+        <!-- Auth / CAPTCHA View -->
+        <section id="auth-view" class="view glass-panel active">
+            <header class="view-header centered">
+                <h1>Nymble.</h1>
+                <p class="subtitle">Complete the challenge to receive your ephemeral identity.</p>
+            </header>
+            
+            <div class="captcha-container">
+                <p id="captcha-question" class="captcha-question-text">Loading secure gateway...</p>
+                <div class="input-group">
+                    <input type="text" id="captcha-answer" placeholder="Your Answer..." autocomplete="off">
+                </div>
+                <button id="btn-submit-captcha" class="glass-btn primary-btn">
+                    Enter <span class="arrow">→</span>
+                </button>
+                <p id="auth-error" class="error-msg hidden"></p>
+            </div>
+        </section>
+
+        <!-- Main Feed / Boards View -->
+        <section id="boards-view" class="view hidden">
+            <header class="app-topbar glass-panel-sm">
+                <div class="topbar-left">
+                    <h2>Nymble</h2>
+                </div>
+                <div class="topbar-right">
+                    <div class="identity-badge glass-panel-sm">
+                        <span class="identity-icon">🎭</span>
+                        <span id="user-identity">Anonymous</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="boards-layout">
+                <aside class="sidebar glass-panel">
+                    <div class="sidebar-section">
+                        <h3>Public Boards</h3>
+                        <ul id="board-list" class="nav-list">
+                            <!-- Populated dynamically -->
+                        </ul>
+                    </div>
+                </aside>
+                
+                <div class="feed-area">
+                    <div class="composer glass-panel">
+                        <textarea id="composer-text" placeholder="Share your thoughts (whispers supported)..."></textarea>
+                        <div class="composer-actions">
+                            <label class="whisper-toggle">
+                                <input type="checkbox" id="composer-whisper">
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-label">Whisper Mode</span>
+                            </label>
+                            <button id="btn-post" class="glass-btn primary-btn">Post</button>
+                        </div>
+                    </div>
+                    
+                    <div id="posts-container" class="posts-list">
+                        <!-- Posts go here -->
+                        <div class="glass-panel skeleton-loader">
+                            <p>Loading feeds...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+</body>
+</html>
