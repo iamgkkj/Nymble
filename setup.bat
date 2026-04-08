@@ -16,7 +16,7 @@ IF EXIST backend\requirements.txt (
     echo requirements.txt not found. Skipping dependency installation.
 )
 
-echo Setup complete! To run the backend server:
+echo Setup complete! To run the server:
 echo call venv\Scripts\activate
-echo cd backend ^&^& uvicorn main:app --reload
+echo uvicorn backend.main:app --reload
 pause

@@ -20,6 +20,6 @@ else
     echo "requirements.txt not found. Skipping dependency installation."
 fi
 
-echo "Setup complete! To run the backend server:"
+echo "Setup complete! To run the server:"
 echo "source venv/bin/activate"
-echo "cd backend && uvicorn main:app --reload"
+echo "uvicorn backend.main:app --reload"
