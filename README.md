@@ -11,9 +11,9 @@ Privacy-first, anonymous, low-pressure social interaction platform where users c
 
 ## Architecture
 
-- **Backend**: FastAPI (Python) for API and WebSockets.
-- **Database**: SQLite (upgrade-ready for Postgres later).
-- **Frontend**: Vanilla JS / Minimal UI (to be developed).
+- **Backend**: FastAPI (Python) for robust REST and real-time WebSockets routing.
+- **Database**: SQLite (SQLAlchemy ORM configured).
+- **Frontend**: Zero-build pure HTML/JS Vanilla pipeline running luxurious Glassmorphic UI with dynamic light/dark tokens.
 
 ### Token System
 
@@ -21,7 +21,11 @@ The ONLY way to restore your session or access the platform is through a unique 
 
 ### Moderation System
 
-A rigorous backend filter evaluates all public interactions to maintain a safe environment, blocking or masking sensitive and abusive content.
+A rigorous backend filter evaluates all public interactions to maintain a safe environment, blocking or masking sensitive and abusive content automatically.
+
+### Whisper Mode
+
+Nymble features a unique natively-supported `is_whisper` flag that users can pass on public posts and private messages to signify safe-for-work filtering and blurred spoiler protections.
 
 ## Setup Instructions
 

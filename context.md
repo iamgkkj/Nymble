@@ -40,10 +40,20 @@ We are following a phased approach to build out the core features without over-e
 - [x] Create gorgeous zero-build plain HTML/JS frontend architecture
 - [x] Integrate luxury glassmorphism stylesheets and dynamic background orbs
 - [x] Hook in theme toggling logic (Dark/Light mode) without frameworks
-### Phase 10: Documentation + scripts (Pending)
+### Phase 10: Documentation + scripts (Completed)
+- [x] Consolidate `README.md`
+- [x] Validate cross-platform setup scripts (`setup.sh`, `setup.bat`)
+- [x] Mark tracker 100% completed!
 
 ## Completed Features
-*(None yet)*
+- ✅ Zero-login Ephemeral Indentity System 
+- ✅ Token-based Backend Session Restore
+- ✅ Image Hosting / MIME Form Data extraction
+- ✅ SQLite Persistent Threading
+- ✅ Live Private Socket Messages
+- ✅ Live Group / Channel Socket Messages
+- ✅ Active Background Text Moderation
+- ✅ Zero-build Glassmorphic UI Architecture
 
 ## Known Issues / Notes
 - Just started project initialization.
